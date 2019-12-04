@@ -1,6 +1,6 @@
 import argparse
 from datetime import date, timedelta
-from random import randint
+import random 
 import os
 import urllib.request
 
@@ -41,10 +41,70 @@ def parse_command_line():
     args = parser.parse_args()
     return args
 
+
+def create_date(datelist, surprise):
+    """
+    Create a valid date object.
+    
+    If datelist is not an empty list, create a date object using the data in the list [month day year].
+    If datelist is empty, and surprise is True, create a random date object between June 16 1995 and today.
+    If datelist is empty and surprise is False, create a date object using yesterday's date
+    
+    If the datelist contain invalid information (i.e. month = 1323), the function should return None
+    If the created date is invalid (i.e. earlier than June 16 1995 or later than today), the function should return None
+    
+    HINTS: 
+        - Use exception handling to validate the info in the datelist
+        - Use timedelta objects to generate a surprise date
+    
+    args:
+        d: list containing the [month, day, year] or an empty list []
+        surprise: Boolean, if True and datelist is empty, generate a random date 
+                  the earliest valid date is June 16 1995
+    
+    returns:
+        created valid date object or None when date selected by user is invalid (i.e. in the future)
+    """
+    
+    #TODO: Your code goes here
+    if datelist:
+        month = datelist[0]
+        day = datelist[1]
+        year = datelist[2]
+        try:
+            d_beforeChecked = date(year, month, day)
+        except ValueError:
+            return None
+        d = valid_date(d_beforeChecked)
+    elif not(datelist) and surprise:
+        min_year=1995
+        max_year=date.today().year
+        start = date(min_year, 1, 1)
+        years = max_year - min_year+1
+        end = start + timedelta(days=365 * years)
+        d = start + (end - start) * random.random()
+    elif not(datelist) and not(surprise):
+        today_date = date.today()
+        num = timedelta(1)
+        d = today_date - num
+    return d
+
+
+def valid_date(input_date):
+    max_d = date.today()
+    min_d = date(1995,6,16)
+    check_date = input_date
+    if input_date < min_d or input_date > max_d:
+        return None
+    else:
+        return input_date
+
+
 def main():
     # parse command line arguments
     args = parse_command_line()
-    print(args.verbose)
+    d = create_date(args.date,args.surprise)
+    print(d)
 
 
 main()
